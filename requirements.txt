@@ -1,0 +1,23 @@
+# ---------------------------------------------------------------------------
+# REQUIRED. The entire deterministic suite (28 tests) runs on pytest alone,
+# with no API key, no deployed chatbot, and no network access.
+#
+#   pip install -r requirements.txt
+#   pytest tests/ -v
+# ---------------------------------------------------------------------------
+pytest>=7.4
+
+# ---------------------------------------------------------------------------
+# OPTIONAL. deepeval powers only the LLM-as-judge demonstration in
+# tests/test_semantic_assertions.py::test_llm_as_judge_assertion.
+#
+# It is commented out on purpose. That test SKIPS cleanly when deepeval is
+# absent, or when it is present but no model credentials are configured, so a
+# fresh clone is green without it. Uncomment it and export a model API key
+# (OPENAI_API_KEY, ANTHROPIC_API_KEY, or DEEPEVAL_MODEL) to turn that one test
+# into a real gate.
+#
+# Note the tradeoff you are opting into: the suite stops being offline,
+# deterministic, and free.
+# ---------------------------------------------------------------------------
+# deepeval>=1.0

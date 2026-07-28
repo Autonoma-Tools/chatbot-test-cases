@@ -1,0 +1,41 @@
+name: chatbot tests
+
+# Runs the full case library on every pull request. If branch protection
+# requires this check, a failing assertion blocks the merge, which is the point:
+# chatbot behavior regressions should be caught the same way any other
+# regression is.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    name: pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # deepeval is best-effort. The deterministic suite must never be blocked by
+      # a transient failure installing an optional dependency, so a failed
+      # deepeval install falls back to installing pytest alone.
+      - name: Install dependencies
+        run: pip install pytest deepeval || pip install pytest
+
+      # The LLM-as-judge test in tests/test_semantic_assertions.py skips cleanly
+      # rather than failing when no model credentials are present, so this job is
+      # green by default on a fresh clone with zero secrets configured. It becomes
+      # a real LLM-judge gate only once a team adds their own key as a repository
+      # secret and wires it into this step's env, e.g.:
+      #
+      #   env:
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #
+      # Everything else here is deterministic and needs no network access.
+      - name: Run test suite
+        run: pytest tests/ -v
